@@ -1,0 +1,11 @@
+.ws-url{
+    margin-right:0;
+}
+
+.chat {
+    min-height: 300px;
+}
+
+.message {
+    resize: none;
+}

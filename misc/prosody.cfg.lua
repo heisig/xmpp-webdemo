@@ -210,4 +210,4 @@ VirtualHost "localhost"
 
 -- Include "conf.d/*.cfg.lua"
 
-consider_websocket_secure = true;
+--consider_websocket_secure = true;
