@@ -13,3 +13,11 @@
 .hidden {
     display: none;
 }
+
+.login-label {
+    margin-left: 15px;
+}
+
+.right {
+    float: right;
+}

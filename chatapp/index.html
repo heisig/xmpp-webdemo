@@ -47,24 +47,37 @@
                 aria-hidden="true">&times;</span>
         </button>
         <strong>Logins:</strong>
-        <span class="label label-primary" onclick="fillLogin('stanzaio@localhost','stanza');">
+        <span class="label label-primary login-label" onclick="fillLogin('stanzaio@localhost','stanza');">
             stanzaio@localhost:stanza
+        </span>
+        <span class="label label-primary login-label" onclick="fillLogin('xmppftw@localhost','xmppftw');">
+            xmppftw@localhost:xmppftw
+        </span>
+        <span class="label label-primary login-label" onclick="fillLogin('strophejs@localhost','strophejs');">
+            strophejs@localhost:strophejs
         </span>
     </div>
 
     <div class="row">
-        <div class="chat-window col-md-12">
+        <div class="chat-window col-md-8">
             <div class="panel panel-default">
                 <div class="panel-heading">Chat</div>
                 <div class="panel-body chat">
-                    Messages will go here...
+                    <ul class="chat-messages"></ul>
                 </div>
                 <div class="panel-footer">
                     <div class="input-group">
-                        <input class="form-control custom-control text" placeholder="Your Message"/>
+                        <input class="form-control custom-control message-text text" placeholder="Your Message"/>
                         <span class="input-group-addon btn btn-default btn-send">Send</span>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="friends col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Friendlist</div>
+                <ul class="list-group friend-list">
+                </ul>
             </div>
         </div>
     </div>
