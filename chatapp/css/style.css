@@ -10,14 +10,38 @@
     resize: none;
 }
 
-.hidden {
-    display: none;
-}
-
 .login-label {
     margin-left: 15px;
 }
 
 .right {
     float: right;
+}
+
+.chat-messages {
+    padding: 0;
+    list-style: none;
+}
+
+.chat-messages li {
+    width: 100%;
+    text-align: left;
+}
+
+.chat-messages li span.text {
+    display: inline-block;
+    padding: 5px 10px;
+    background-image: linear-gradient(to bottom, #ddd 0px, #ccc 100%);
+    background-repeat: repeat-x;
+    border: 1px solid #bbbbbb;
+    border-radius: 4px;
+}
+
+.chat-messages li.own {
+    text-align: right;
+}
+.chat-messages li.own span.text {
+    background-image: linear-gradient(to bottom, #D9EDF7 0px, #B9DEF0 100%);
+    background-repeat: repeat-x;
+    border: 1px solid #9ACFEA;
 }
