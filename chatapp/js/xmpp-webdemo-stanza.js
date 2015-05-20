@@ -86,6 +86,8 @@ function initListeners() {
      * On Message received
      */
     client.on('chat', function (message) {
+        console.log('chat');
+        console.dir(message);
         addChatMessage(message, false);
     });
 

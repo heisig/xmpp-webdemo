@@ -25,6 +25,7 @@ $(function () {
         $('.login').show();
         $('.connected').hide();
         clearUserList();
+        $('.chat-window').addClass('hidden');
     });
 });
 
@@ -73,7 +74,7 @@ var getChatWindow = function (user) {
         '<div class="panel-body chat"><ul class="chat-messages"></ul>' +
         '</div><div class="panel-footer">' +
         '<div class="input-group">' +
-        '<input class="form-control custom-control message-text text" placeholder="Your Message"/>' +
+        '<input class="form-control custom-control message-text text" type="text" placeholder="Your Message"/>' +
         '<span class="input-group-addon btn btn-default btn-send" ' +
         'onclick="sendMessage(\'' + user.jid + '\',\'' + user.local + '\')">Send</span></div></div></div>'
 
@@ -89,22 +90,36 @@ var openChat = function (jid, local) {
 };
 
 var sendMessage = function (jid, local) {
-    var message = $('#chat-window-' + local + ' .message-text').val();
+    var messageTextField = $('#chat-window-' + local + ' .message-text');
+    var message = messageTextField.val();
     stanzaSendMessage(message, jid);
+    messageTextField.val('');
 };
 
 var addChatMessage = function (message, own) {
-    console.log('add Chat Message');
+    console.log('message: ');
     console.dir(message);
-    console.log('own Message: ' + own);
+    console.log("own: " + own);
     var windowId;
     if (own) {
         windowId = message.to.local;
-        $('#chat-window-' + windowId + ' .chat-messages').append('<li class="chat-message own">' +
-            '<span class="text">' + message.body + '</span></li>');
+        var chatMessages = $('#chat-window-' + windowId + ' .chat-messages');
+        var chatMessageElements = $('#chat-window-' + windowId + ' .chat-messages li');
+        if(chatMessageElements.last().hasClass('own')){
+            chatMessageElements.last().find('.message-container').append('<span class="text">' + message.body + '</span>');
+        } else {
+         chatMessages.append('<li class="chat-message own"><div class="message-container">' +
+             '<span class="text">' + message.body + '</span></div></li>');
+        }
     } else {
         windowId = message.from.local;
-        $('#chat-window-' + windowId + ' .chat-messages').append('<li class="chat-message">' +
-            '<span class="text">' + message.body + '</span></li>');
+        var chatMessages = $('#chat-window-' + windowId + ' .chat-messages');
+        var chatMessageElements = $('#chat-window-' + windowId + ' .chat-messages li');
+        if(chatMessageElements.last().length > 0 && !chatMessageElements.last().hasClass('own')){
+            chatMessageElements.last().find('.message-container').append('<span class="text">' + message.body + '</span>');
+        } else {
+            chatMessages.append('<li class="chat-message"><div class="message-container">' +
+                '<span class="text">' + message.body + '</span></div></li>');
+        }
     }
 };

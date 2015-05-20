@@ -28,7 +28,8 @@
     text-align: left;
 }
 
-.chat-messages li span.text {
+.chat-messages li .message-container {
+    max-width: 40%;
     display: inline-block;
     padding: 5px 10px;
     background-image: linear-gradient(to bottom, #ddd 0px, #ccc 100%);
@@ -37,10 +38,20 @@
     border-radius: 4px;
 }
 
+
+.chat-messages li span.text {
+    display: block;
+    margin-top: 5px;
+}
+
+.chat-messages li span.text:first-child {
+    margin-top: 0;
+}
+
 .chat-messages li.own {
     text-align: right;
 }
-.chat-messages li.own span.text {
+.chat-messages li.own .message-container {
     background-image: linear-gradient(to bottom, #D9EDF7 0px, #B9DEF0 100%);
     background-repeat: repeat-x;
     border: 1px solid #9ACFEA;
