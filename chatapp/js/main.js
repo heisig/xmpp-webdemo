@@ -1,3 +1,7 @@
+var timeout = 4000;
+var timer;
+var typing = false;
+
 $(function () {
 
     var loginBtn = $('.btn-login');
@@ -50,6 +54,9 @@ var fillUserList = function (ownJid) {
             $('.friend-list').append(buttonGroup);
             var chatWindow = getChatWindow(user);
             $('.chat-windows').append(chatWindow);
+            $('#friend-' + user.local + ' .btn-open-chat').on('click', user, openChat);
+            $('#chat-window-' + user.local + ' .btn-send').on('click', user, sendMessage);
+            $('#chat-window-' + user.local + ' .message-text').bind('keypress', user, messageTextFieldKeyPress);
         }
     });
 };
@@ -61,8 +68,7 @@ var clearUserList = function () {
 var getButtonGroup = function (user) {
     var buttonGroup = '<li id="friend-' + user.local + '" class="list-group-item friend clearfix">' + user.local +
         ' <div class="btn-group user right" role="group">' +
-        '<button type="button" class="btn btn-success btn-open-chat" ' +
-        'onclick="openChat(\'' + user.jid + '\',\'' + user.local + '\')">open chat</button>' +
+        '<button type="button" class="btn btn-success btn-open-chat">open chat</button>' +
         '</div></li>';
 
     return buttonGroup;
@@ -75,24 +81,48 @@ var getChatWindow = function (user) {
         '</div><div class="panel-footer">' +
         '<div class="input-group">' +
         '<input class="form-control custom-control message-text text" type="text" placeholder="Your Message"/>' +
-        '<span class="input-group-addon btn btn-default btn-send" ' +
-        'onclick="sendMessage(\'' + user.jid + '\',\'' + user.local + '\')">Send</span></div></div></div>'
+        '<span class="input-group-addon btn btn-default btn-send">Send</span></div></div></div>'
 
     return chatWindow;
 };
 
-var openChat = function (jid, local) {
-    console.log('open Chat: ' + jid + ' ' + local);
+var openChat = function (event) {
+    var user = event.data;
+    console.log('open Chat: ' + user.jid + ' ' + user.local);
     $('.friend').removeClass('active');
-    $('#friend-' + local).addClass('active');
+    $('#friend-' + user.local).addClass('active');
     $('.chat-window').addClass('hidden');
-    $('#chat-window-' + local).removeClass('hidden');
+    $('#chat-window-' + user.local).removeClass('hidden');
 };
 
-var sendMessage = function (jid, local) {
-    var messageTextField = $('#chat-window-' + local + ' .message-text');
+var messageTextFieldKeyPress = function(event){
+    var code = event.keyCode || event.which;
+    if(code == 13) {
+        sendMessage(event);
+        stanzaSendChatState('paused', user.jid);
+        typing = false;
+    } else {
+        var user = event.data;
+
+        clearTimeout(timer);
+
+        timer = setTimeout(function(){
+            stanzaSendChatState('paused', user.jid);
+            typing = false;
+        }, timeout);
+
+        if (!typing){
+            stanzaSendChatState('composing', user.jid);
+            typing = true;
+        }
+    }
+};
+
+var sendMessage = function (event) {
+    var user = event.data;
+    var messageTextField = $('#chat-window-' + user.local + ' .message-text');
     var message = messageTextField.val();
-    stanzaSendMessage(message, jid);
+    stanzaSendMessage(message, user.jid);
     messageTextField.val('');
 };
 
@@ -121,5 +151,13 @@ var addChatMessage = function (message, own) {
             chatMessages.append('<li class="chat-message"><div class="message-container">' +
                 '<span class="text">' + message.body + '</span></div></li>');
         }
+    }
+};
+
+var toggleChatState = function(state){
+    if(state === 'composing'){
+        console.log('#################### composing');
+    } else if (state === 'paused'){
+        console.log('#################### paused');
     }
 };

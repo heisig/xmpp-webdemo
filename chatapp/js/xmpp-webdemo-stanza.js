@@ -23,6 +23,13 @@ var stanzaSendMessage = function (message, receiver) {
     });
 };
 
+var stanzaSendChatState = function(state, receiver){
+    client.sendMessage({
+        to: receiver,
+        chatState: state
+    });
+};
+
 function initListeners() {
     /**
      * On Connected change Login Bar
@@ -65,14 +72,9 @@ function initListeners() {
      */
     client.on('message:sent', function (message) {
         console.log("message sent");
-        addChatMessage(message, true);
-    });
-
-    /**
-     * On Chat partner is composing
-     */
-    client.on('chat:state', function () {
-
+        if(message.body && message.body !== ''){
+            addChatMessage(message, true);
+        }
     });
 
     /**
@@ -80,6 +82,13 @@ function initListeners() {
      */
     client.on('chat', function (message) {
         addChatMessage(message, false);
+    });
+
+    /**
+     * On Chat State Message received
+     */
+    client.on('chat:state', function(message){
+        toggleChatState(message.chatState);
     });
 
     /**
