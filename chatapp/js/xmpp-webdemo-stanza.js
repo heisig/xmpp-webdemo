@@ -61,14 +61,7 @@ function initListeners() {
     });
 
     /**
-     * Send Message and print to chat
-     */
-    client.on('message', function (message) {
-
-    });
-
-    /**
-     * On Message sent
+     * On Message sent to friend
      */
     client.on('message:sent', function (message) {
         console.log("message sent");
@@ -86,8 +79,6 @@ function initListeners() {
      * On Message received
      */
     client.on('chat', function (message) {
-        console.log('chat');
-        console.dir(message);
         addChatMessage(message, false);
     });
 

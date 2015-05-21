@@ -1,0 +1,11 @@
+Aufgabe
+Erstellung einer einfachen Web-App, welche mittels XMPP über Websockets Interaktion zwischen Nutzern erlaubt.
+Also XMPP Servier soll Prosody dienen. Ziel ist es, drei Javascript-basierte Frameworks im Bezug auf einfache Anwendbarkeit und Funktionsumfang miteinander zu vergleichen.
+
+Vergleich
+Strophe.js:
+- keine Unterstützung von Websockets ohne zusätzliches Plugin
+
+Stanza:
+- umständliche Installation der Demo
+- 
