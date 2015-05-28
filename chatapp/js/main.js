@@ -1,6 +1,7 @@
-var timeout = 4000;
+var timeout = 2000;
 var timer;
 var typing = false;
+var currentFramework = null;
 
 $(function () {
 
@@ -18,14 +19,23 @@ $(function () {
         }
         var jid = $('.name').val();
         var password = $('.password').val();
-        stanzaCreateClient(jid, password);
+
+        if(jid === 'stanzaio@localhost'){
+            currentFramework = stanza;
+        } else if(jid === 'strophejs@localhost'){
+            currentFramework = strophe;
+        } else if(jid === 'xmppftw@localhost'){
+            currentFramework = stanza;
+        }
+
+        currentFramework.createClient(jid, password);
     });
 
     /**
      * Disconnect and Logout
      */
     logoutBtn.on('click', function () {
-        client.disconnect();
+        currentFramework.disconnectClient();
         $('.login').show();
         $('.connected').hide();
         clearUserList();
@@ -59,6 +69,7 @@ var fillUserList = function (ownJid) {
             $('#chat-window-' + user.local + ' .message-text').bind('keypress', user, messageTextFieldKeyPress);
         }
     });
+    $('.typing').hide();
 };
 
 var clearUserList = function () {
@@ -79,16 +90,16 @@ var getChatWindow = function (user) {
         '<div class="panel-heading">Chat with ' + user.local + '</div>' +
         '<div class="panel-body chat"><ul class="chat-messages"></ul>' +
         '</div><div class="panel-footer">' +
+        '<div class="typing"><span class="label label-default">' + user.local +  ' is typing</span></div>' +
         '<div class="input-group">' +
         '<input class="form-control custom-control message-text text" type="text" placeholder="Your Message"/>' +
-        '<span class="input-group-addon btn btn-default btn-send">Send</span></div></div></div>'
+        '<span class="input-group-addon btn btn-default btn-send">Send</span></div></div></div>';
 
     return chatWindow;
 };
 
 var openChat = function (event) {
     var user = event.data;
-    console.log('open Chat: ' + user.jid + ' ' + user.local);
     $('.friend').removeClass('active');
     $('#friend-' + user.local).addClass('active');
     $('.chat-window').addClass('hidden');
@@ -97,22 +108,22 @@ var openChat = function (event) {
 
 var messageTextFieldKeyPress = function(event){
     var code = event.keyCode || event.which;
+    var user = event.data;
     if(code == 13) {
+        clearTimeout(timer);
+        currentFramework.sendChatState('paused', user.jid);
         sendMessage(event);
-        stanzaSendChatState('paused', user.jid);
         typing = false;
     } else {
-        var user = event.data;
-
         clearTimeout(timer);
 
         timer = setTimeout(function(){
-            stanzaSendChatState('paused', user.jid);
+            currentFramework.sendChatState('paused', user.jid);
             typing = false;
         }, timeout);
 
         if (!typing){
-            stanzaSendChatState('composing', user.jid);
+            currentFramework.sendChatState('composing', user.jid);
             typing = true;
         }
     }
@@ -122,14 +133,11 @@ var sendMessage = function (event) {
     var user = event.data;
     var messageTextField = $('#chat-window-' + user.local + ' .message-text');
     var message = messageTextField.val();
-    stanzaSendMessage(message, user.jid);
+    currentFramework.sendMessage(message, user.jid);
     messageTextField.val('');
 };
 
 var addChatMessage = function (message, own) {
-    console.log('message: ');
-    console.dir(message);
-    console.log("own: " + own);
     var windowId;
     if (own) {
         windowId = message.to.local;
@@ -154,10 +162,12 @@ var addChatMessage = function (message, own) {
     }
 };
 
-var toggleChatState = function(state){
+var toggleChatState = function(message){
+    var state = message.chatState;
+    var local = message.from.local;
     if(state === 'composing'){
-        console.log('#################### composing');
+        $('#chat-window-' + local + ' .typing').show();
     } else if (state === 'paused'){
-        console.log('#################### paused');
+        $('#chat-window-' + local + ' .typing').hide();
     }
 };
