@@ -9,13 +9,17 @@ var strophe = {
         this.client = new Strophe.Connection('ws://localhost:5280/xmpp-websocket');
         this.client.connect(jid, password, strophe.connectionCallback);
     },
+    disconnectClient: function(){
+      this.client.disconnect('disconnected by client');
+    },
     connectionCallback: function (status) {
         if (status === Strophe.Status.CONNECTED) {
             $('.login').hide();
             $('.connected').show();
             strophe.client.roster.requestRoster(strophe.rosterCallback);
+            Strophe.addNamespace('CHATSTATES', 'http://jabber.org/protocol/chatstates');
             strophe.client.addHandler(strophe.onMessageHandler, null, 'message');
-            strophe.client.addHandler(strophe.onChatStateHandler, 'http://jabber.org/protocol/chatstates', 'message');
+            strophe.client.addHandler(strophe.onChatStateHandler, Strophe.NS.CHATSTATES, 'message');
             strophe.client.send($pres());
         }
     },
@@ -47,7 +51,16 @@ var strophe = {
         addChatMessage(messageObject, true);
     },
     sendChatState: function (state, receiver) {
-
+        if(state === 'composing' || state === 'paused'){
+            var msg = $msg({to: receiver, type: 'chat'});
+            if(state === 'composing'){
+                msg.c('composing', {xmlns: Strophe.NS.CHATSTATES});
+            }
+            if(state === 'paused'){
+                msg.c('paused', {xmlns: Strophe.NS.CHATSTATES});
+            }
+            strophe.client.send(msg.tree());
+        }
     },
     getBareJid: function (jid) {
         return jid.split('/')[0];
@@ -99,23 +112,5 @@ var strophe = {
             toggleChatState(message);
         }
         return true;
-    },
-    initListeners: function () {
-
-        /**
-         * On Chat State Message received
-         */
-        this.client.on('chat:state', function (message) {
-            toggleChatState(message);
-        });
-
-        /**
-         * Log of all xmpp client events
-         */
-        this.client.on('*', function (name) {
-            if (this.debugMode) {
-                console.log(name);
-            }
-        });
     }
 };

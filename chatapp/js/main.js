@@ -39,7 +39,8 @@ $(function () {
         $('.login').show();
         $('.connected').hide();
         clearUserList();
-        $('.chat-window').addClass('hidden');
+        $('.chat-windows').empty();
+
     });
 });
 
