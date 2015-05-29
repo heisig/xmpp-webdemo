@@ -4,6 +4,7 @@
 
 .chat {
     min-height: 300px;
+    max-height: 500px;
 }
 
 .message {
@@ -23,11 +24,13 @@
     list-style: none;
 }
 
+/* each chat message takes up a whole line to ensure the correct order of sent and received messages */
 .chat-messages li {
     width: 100%;
     text-align: left;
 }
 
+/* chat bubble style */
 .chat-messages li .message-container {
     max-width: 40%;
     display: inline-block;
@@ -38,26 +41,31 @@
     border-radius: 4px;
 }
 
-
-.chat-messages li span.text {
-    display: block;
-    margin-top: 5px;
-    word-wrap:break-word;
-}
-
-.chat-messages li span.text:first-child {
-    margin-top: 0;
-}
-
-.chat-messages li.own {
-    text-align: right;
-}
+/* chat bubble style for own messages */
 .chat-messages li.own .message-container {
     background-image: linear-gradient(to bottom, #D9EDF7 0px, #B9DEF0 100%);
     background-repeat: repeat-x;
     border: 1px solid #9ACFEA;
 }
 
+/* chat bubble text */
+.chat-messages li span.text {
+display: block;
+margin-top: 5px;
+word-wrap:break-word;
+}
+
+/* corrected top margin for first text entry in chat bubble */
+.chat-messages li span.text:first-child {
+margin-top: 0;
+}
+
+/* alignment of messages sent */
+.chat-messages li.own {
+text-align: right;
+}
+
+/* chat state message */
 .typing {
     margin-top: -45px;
     margin-bottom: 25px;

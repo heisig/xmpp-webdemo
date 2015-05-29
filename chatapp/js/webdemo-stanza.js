@@ -2,9 +2,18 @@
  * Class that serves as api for Stanza IO
  */
 
+/* Object that encapsulates used functionality of the stanza io framework */
 var stanza = {
     debugMode: true,
     client: {},
+
+    /**
+     * Function to create a new connection to the websocket and login to the xmpp server.
+     * All necessary listeners are registered with initListeners.
+     *
+     * @param jid
+     * @param password
+     */
     createClient: function (jid, password) {
         this.client = XMPP.createClient({
             jid: jid,
@@ -15,24 +24,46 @@ var stanza = {
         this.initListeners();
         this.client.connect();
     },
+
+    /**
+     * Function to sent messages.
+     *
+     * @param message
+     * @param receiver
+     */
     sendMessage: function (message, receiver) {
         this.client.sendMessage({
             to: receiver,
             body: message
         });
     },
+
+    /**
+     * Function to send chat state messages.
+     *
+     * @param state
+     * @param receiver
+     */
     sendChatState: function (state, receiver) {
         this.client.sendMessage({
             to: receiver,
             chatState: state
         });
     },
+
+    /**
+     * Function to disconnect from the websocket
+     */
     disconnectClient: function(){
       this.client.disconnect();
     },
+
+    /**
+     * Function to register all necessary handlers.
+     */
     initListeners: function() {
         /**
-         * On Connected change Login Bar
+         * On a successful connect show the connected label and logout button in the navbar
          */
         this.client.on('connected', function () {
             $('.login').hide();
@@ -40,16 +71,9 @@ var stanza = {
         });
 
         /**
-         *  Session Started Handling
+         *  If the Session was started successfully get the roster and fill the friendlist.
          */
         this.client.on('session:started', function () {
-            //stanza.client.subscribe("stanzaio@localhost");
-            //stanza.client.subscribe("xmppftw@localhost");
-            //stanza.client.subscribe("strophejs@localhost");
-            //stanza.client.acceptSubscription("stanzaio@localhost");
-            //stanza.client.acceptSubscription("xmppftw@localhost");
-            //stanza.client.acceptSubscription("strophejs@localhost");
-
             stanza.client.getRoster(function (err, response) {
                 stanza.client.updateCaps();
                 stanza.client.sendPresence({
@@ -73,7 +97,7 @@ var stanza = {
         });
 
         /**
-         * On Message sent to friend
+         * On Message sent add the message to the chat window
          */
         this.client.on('message:sent', function (message) {
             if (message.body && message.body !== '') {
@@ -82,21 +106,21 @@ var stanza = {
         });
 
         /**
-         * On Message received
+         * On Message received add the received message to the chat window
          */
         this.client.on('chat', function (message) {
             addChatMessage(message, false);
         });
 
         /**
-         * On Chat State Message received
+         * On Chat State Message received toggle the composing label
          */
         this.client.on('chat:state', function (message) {
             toggleChatState(message);
         });
 
         /**
-         * Log of all xmpp client events
+         * Log of all xmpp client events if the debug flag is true
          */
         this.client.on('*', function (name) {
             if (this.debugMode) {
